@@ -13,10 +13,18 @@ var getUserRepos = function (user) {
 
     //make a request to the url
     fetch(apiUrl).then(function (response) {
-        response.json().then(function (data) {
-            displayRepos(data, user);
-        });
-    });
+        if (response.ok) {
+            response.json().then(function (data) {
+                displayRepos(data, user);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    })
+.catch(function(error) {
+    // Notice this ` .catch()` gettin chained onto the of the `.then()` method
+    alert("Unable to connect to Github");
+})
 };
 
 
@@ -35,7 +43,11 @@ var formSubmitHandler = function (event) {
     console.log(event);
 };
 
-var displayRepos = function(repos, searchTerm) {
+var displayRepos = function (repos, searchTerm) {
+    if (repos.length === 0) {
+        repoContainerEl.textContent = "No repositories found.";
+        return;
+    }
     repoContainerEl.textContent = "";
     repoSearchTerm.textContent = searchTerm
     //loop over repos
@@ -53,7 +65,7 @@ var displayRepos = function(repos, searchTerm) {
 
         // append to container
         repoEl.appendChild(titleEl);
-        
+
         //create a status element
         var statusEl = document.createElement("span");
         statusEl.classList = "flex-row align-center";
@@ -63,7 +75,7 @@ var displayRepos = function(repos, searchTerm) {
             statusEl.innerHTML = "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + " issue(s)";
         }
         else {
-            statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";    
+            statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
         }
 
         //append to container
